@@ -32,58 +32,57 @@ metadata {
 		command "heatLevelUp"
 		command "heatLevelDown"
 		command "updateDeviceData", ["string"]
+        
+        attribute "maxSetPoint", "number"
+        attribute "minSetPoint", "number" 
 	}
 
 
-	tiles { 
-    
-       multiAttributeTile(name:"summary", type:"thermostat", width:6, height:4, canChangeIcon: true) {
-			tileAttribute("device.heatingSetPoint", key: "PRIMARY_CONTROL") {
-				attributeState("heatingSetpoint", label:'${currentValue}°')
-			}	
-            tileAttribute("device.heatingSetPoint", key: "VALUE_CONTROL") {
+    tiles {
+
+		standardTile("switch", "device.switch", canChangeIcon: false, decoration: "flat" ) {
+       		state "on", label: 'On', action: "switch.off",
+          		icon: "st.switches.switch.on", backgroundColor: "#79b821"
+       		state"off", label: 'Off', action: "switch.on",
+          		icon: "st.switches.switch.off", backgroundColor: "#ffffff"
+		}
+        
+		standardTile("refresh", "device.switch", decoration: "flat") {
+			state("default", action:"refresh.refresh", icon:"st.secondary.refresh")
+		}
+        
+         multiAttributeTile(name:"summary", type: "thermostat", width: 6, height: 4) {
+        	tileAttribute("device.heatingSetpoint", key: "PRIMARY_CONTROL") {
+				attributeState("heatingSetpoint", label:'${currentValue}°', unit:"dF", defaultState: true)
+			}
+			tileAttribute("changeHeatingSetPoint", key: "VALUE_CONTROL") {
 				attributeState("VALUE_UP", action: "heatLevelUp")
 				attributeState("VALUE_DOWN", action: "heatLevelDown")
 			}
-			tileAttribute('device.thermostatOperatingStateDisplay', key: "OPERATING_STATE") {
-				attributeState('idle', backgroundColor:"#d28de0")
-				attributeState('heating', backgroundColor:"#ff9c14")	
-                attributeState('off', backGroundColor:"#cccccc")			
-                attributeState('default', /* label: 'idle', */ backgroundColor:"#d28de0", defaultState: true) 
+			tileAttribute('thermostatOperatingStateDisplay', key: "OPERATING_STATE") {
+				attributeState('idle', label: "idle", backgroundColor:"#d28de0")
+				attributeState('heating', label: "heating", backgroundColor:"#ff9c14")	
+                attributeState('off', label: "off", backGroundColor:"#21212")			
+                attributeState('default', label: "idle", backgroundColor:"#d28de0", defaultState: true) 
 			}
-            tileAttribute ("device.water", key: "SECONDARY_CONTROL") {
-				attributeState "dry", 
-					label:'Dry', 
-					icon: "st.alarm.water.dry",
-					backgroundColor:"#ffffff"
+            tileAttribute ("device.water", key: "SECONDARY_CONTROL") {				
 				attributeState "wet", 
 					label:'Wet', 
 					icon:"st.alarm.water.wet", 
-					backgroundColor:"#53a7c0"				
-			}	
-            
+					backgroundColor:"#53a7c0"
+                    attributeState "dry", 
+					label:'Dry', 
+					icon: "st.alarm.water.dry",
+					backgroundColor:"#ffffff"			
+			}
 			
-		} // End multiAttributeTile
+        }
         
-       standardTile("refresh", "device.switch", decoration: "flat") {
-			state("default", action:"refresh.refresh", icon:"st.secondary.refresh")
-		}
-        standardTile("heatingSetpoint", "device.heatingSetpoint", decoration: "flat") {
-			state("heatingSetpoint", label:'${currentValue}°',
-				backgroundColors:[
-					[value: 90,  color: "#f49b88"],
-					[value: 100, color: "#f28770"],
-					[value: 110, color: "#f07358"],
-					[value: 120, color: "#ee5f40"],
-					[value: 130, color: "#ec4b28"],
-					[value: 140, color: "#ea3811"]					
-				]
-			)
-		}
 		main "summary"
-		details(["summary","refresh", "heatingSetPoint"])
+		details(["summary", "switch", "refresh"])
 	}
 }
+
 
 def parse(String description) { }
 
@@ -92,18 +91,19 @@ def installed() {
 }
 
 def refresh() {
-	log.debug "refresh"
 	parent.refresh()
 }
 
 def on() {
    	parent.setDeviceEnabled(this.device, true)
     sendEvent(name: "switch", value: "off")
+    parent.refresh();
 }
 
 def off() {
    	parent.setDeviceEnabled(this.device, false)
     sendEvent(name: "switch", value: "off")
+    parent.refresh();
 }
 
 def setHeatingSetpoint(Number setPoint) {
@@ -113,24 +113,35 @@ def setHeatingSetpoint(Number setPoint) {
 
 def heatLevelUp() { 
 	def setPoint = device.currentValue("heatingSetpoint")
-    setPoint = setPoint + 1
-	setHeatingSetpoint(setPoint)
+    setPoint = setPoint + 1   
+    if(setPoint <= device.currentValue("maxSetPoint") )
+    {
+        setHeatingSetpoint(setPoint)
+    }
+    else
+    {
+        sendEvent(name: "heatingSetpoint", value: setPoint-1, unit: "F", isStateChange: true, descriptionText:"Max Set Point of " + device.currentValue("maxSetPoint") + " has been reached.")
+    }
 }	
 
 def heatLevelDown() { 
-	def setPoint = device.currentValue("heatingSetpoint")
+	def setPoint = device.currentValue("heatingSetpoint") 
     setPoint = setPoint - 1
-    setHeatingSetpoint(setPoint)
+    if(setPoint >= device.currentValue("minSetPoint") )
+    {
+        setHeatingSetpoint(setPoint)
+    }
+    else
+    {
+        sendEvent(name: "heatingSetpoint", value: setPoint+1, unit: "F", isStateChange: true, descriptionText:"Min Set Point of " + device.currentValue("minSetPoint") + " has been reached.")
+    }
 }
 
 def updateDeviceData(data) {
-	
-    log.debug "setpoint"
-    log.debug data.setPoint
+	sendEvent(name: "heatingSetpoint", value: data.setPoint)    
     sendEvent(name: "water", value: data.hasCriticalAlert ? "wet" : "dry")
-    sendEvent(name: "thermostatOperatingStateDisplay", value: data.isEnabled ? (data.inUse ? "heating" : "idle") : "off")
-    sendEvent(name: "heatingSetpoint", value: data.setPoint)
+    sendEvent(name: "thermostatOperatingStateDisplay",  value: (data.isEnabled ? (data.inUse ? "heating" : "idle") : "off"))
+    sendEvent(name: "switch", value: data.isEnabled ? "on" : "off")
+    sendEvent(name: "minSetPoint", value: data.minSetPoint)    
+    sendEvent(name: "maxSetPoint", value: data.maxSetPoint)
 }
-
-
-
