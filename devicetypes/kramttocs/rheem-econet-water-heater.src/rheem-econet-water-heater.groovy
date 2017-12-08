@@ -46,14 +46,10 @@ metadata {
 				attributeState("VALUE_DOWN", action: "heatLevelDown")
 			}
 			tileAttribute('device.thermostatOperatingStateDisplay', key: "OPERATING_STATE") {
-				attributeState('idle', backgroundColor:"#d28de0")			// ecobee purple/magenta
-                
-				attributeState('heating', backgroundColor:"#ff9c14")		// ecobee flame orange
-				
-                attributeState('off', backGroundColor:"#cccccc")			// grey
+				attributeState('idle', backgroundColor:"#d28de0")
+				attributeState('heating', backgroundColor:"#ff9c14")	
+                attributeState('off', backGroundColor:"#cccccc")			
                 attributeState('default', /* label: 'idle', */ backgroundColor:"#d28de0", defaultState: true) 
-			
-			
 			}
             tileAttribute ("device.water", key: "SECONDARY_CONTROL") {
 				attributeState "dry", 
@@ -70,7 +66,7 @@ metadata {
 		} // End multiAttributeTile
         
        standardTile("refresh", "device.switch", decoration: "flat") {
-			state("default", action:"refresh.refresh",        icon:"st.secondary.refresh")
+			state("default", action:"refresh.refresh", icon:"st.secondary.refresh")
 		}
         standardTile("heatingSetpoint", "device.heatingSetpoint", decoration: "flat") {
 			state("heatingSetpoint", label:'${currentValue}°',
