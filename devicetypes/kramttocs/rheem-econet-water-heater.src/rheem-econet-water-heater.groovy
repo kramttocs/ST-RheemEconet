@@ -1,7 +1,7 @@
 /**
  *  Rheem Econet Water Heater
  *
- *  Copyright 2017 Justin Huff
+ *  Copyright 2017 Scott Mark
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -15,24 +15,64 @@
  *  Last Updated : 2017-01-04
  *
  *  Based on https://github.com/copy-ninja/SmartThings_RheemEcoNet
+ *  Based on https://github.com/jjhuff/SmartThings_RheemEcoNet
  */
+
 metadata {
-	definition (name: "Rheem Econet Water Heater", namespace: "jjhuff", author: "Justin Huff") {
+	definition (name: "Rheem Econet Water Heater", namespace: "kramttocs", author: "Scott Mark") {
 		capability "Actuator"
 		capability "Refresh"
 		capability "Sensor"
         capability "Switch"
 		capability "Thermostat Heating Setpoint"
+        capability "Water Sensor"
+        capability "Thermostat Operating State"
+        
 		
 		command "heatLevelUp"
 		command "heatLevelDown"
 		command "updateDeviceData", ["string"]
 	}
 
-	simulator { }
 
-	tiles {
-		valueTile("heatingSetpoint", "device.heatingSetpoint", inactiveLabel: false, width: 2, height: 2) {
+	tiles { 
+    
+       multiAttributeTile(name:"summary", type:"thermostat", width:6, height:4, canChangeIcon: true) {
+			tileAttribute("device.heatingSetPoint", key: "PRIMARY_CONTROL") {
+				attributeState("heatingSetpoint", label:'${currentValue}°')
+			}	
+            tileAttribute("device.heatingSetPoint", key: "VALUE_CONTROL") {
+				attributeState("VALUE_UP", action: "heatLevelUp")
+				attributeState("VALUE_DOWN", action: "heatLevelDown")
+			}
+			tileAttribute('device.thermostatOperatingStateDisplay', key: "OPERATING_STATE") {
+				attributeState('idle', backgroundColor:"#d28de0")			// ecobee purple/magenta
+                
+				attributeState('heating', backgroundColor:"#ff9c14")		// ecobee flame orange
+				
+                attributeState('off', backGroundColor:"#cccccc")			// grey
+                attributeState('default', /* label: 'idle', */ backgroundColor:"#d28de0", defaultState: true) 
+			
+			
+			}
+            tileAttribute ("device.water", key: "SECONDARY_CONTROL") {
+				attributeState "dry", 
+					label:'Dry', 
+					icon: "st.alarm.water.dry",
+					backgroundColor:"#ffffff"
+				attributeState "wet", 
+					label:'Wet', 
+					icon:"st.alarm.water.wet", 
+					backgroundColor:"#53a7c0"				
+			}	
+            
+			
+		} // End multiAttributeTile
+        
+       standardTile("refresh", "device.switch", decoration: "flat") {
+			state("default", action:"refresh.refresh",        icon:"st.secondary.refresh")
+		}
+        standardTile("heatingSetpoint", "device.heatingSetpoint", decoration: "flat") {
 			state("heatingSetpoint", label:'${currentValue}°',
 				backgroundColors:[
 					[value: 90,  color: "#f49b88"],
@@ -44,30 +84,16 @@ metadata {
 				]
 			)
 		}
-		standardTile("heatLevelUp", "device.switch", canChangeIcon: false, decoration: "flat" ) {
-			state("heatLevelUp",   action:"heatLevelUp",   icon:"st.thermostat.thermostat-up", backgroundColor:"#F7C4BA")
-		}  
-		standardTile("heatLevelDown", "device.switch", canChangeIcon: false, decoration: "flat") {
-			state("heatLevelDown", action:"heatLevelDown", icon:"st.thermostat.thermostat-down", backgroundColor:"#F7C4BA")
-		}
-
-		standardTile("switch", "device.switch", canChangeIcon: false, decoration: "flat" ) {
-       		state "on", label: 'On', action: "switch.off",
-          		icon: "st.switches.switch.on", backgroundColor: "#79b821"
-       		state("off", label: 'Off', action: "switch.on",
-          		icon: "st.switches.switch.off", backgroundColor: "#ffffff")
-		}
-        
-		standardTile("refresh", "device.switch", decoration: "flat") {
-			state("default", action:"refresh.refresh",        icon:"st.secondary.refresh")
-		}
-        
-		main "heatingSetpoint"
-		details(["heatingSetpoint", "heatLevelUp", "heatLevelDown", "switch", "refresh"])
+		main "summary"
+		details(["summary","refresh", "heatingSetPoint"])
 	}
 }
 
 def parse(String description) { }
+
+def installed() {
+	parent.refresh();
+}
 
 def refresh() {
 	log.debug "refresh"
@@ -85,10 +111,7 @@ def off() {
 }
 
 def setHeatingSetpoint(Number setPoint) {
-	/*heatingSetPoint = (heatingSetPoint < deviceData.minTemp)? deviceData.minTemp : heatingSetPoint
-	heatingSetPoint = (heatingSetPoint > deviceData.maxTemp)? deviceData.maxTemp : heatingSetPoint
-    */
-   	sendEvent(name: "heatingSetpoint", value: setPoint, unit: "F")
+	sendEvent(name: "heatingSetpoint", value: setPoint, unit: "F")
 	parent.setDeviceSetPoint(this.device, setPoint)
 }
 
@@ -105,6 +128,13 @@ def heatLevelDown() {
 }
 
 def updateDeviceData(data) {
-	sendEvent(name: "heatingSetpoint", value: data.setPoint, unit: "F")
-    sendEvent(name: "switch", value: data.isEnabled ? "on" : "off")
+	
+    log.debug "setpoint"
+    log.debug data.setPoint
+    sendEvent(name: "water", value: data.hasCriticalAlert ? "wet" : "dry")
+    sendEvent(name: "thermostatOperatingStateDisplay", value: data.isEnabled ? (data.inUse ? "heating" : "idle") : "off")
+    sendEvent(name: "heatingSetpoint", value: data.setPoint)
 }
+
+
+
