@@ -31,6 +31,8 @@ metadata {
 		
 		command "heatLevelUp"
 		command "heatLevelDown"
+        command "eco"
+        command "performance"
 		command "updateDeviceData", ["string"]
         
         attribute "maxSetPoint", "number"
@@ -60,10 +62,10 @@ metadata {
 				attributeState("VALUE_DOWN", action: "heatLevelDown")
 			}
 			tileAttribute('thermostatOperatingStateDisplay', key: "OPERATING_STATE") {
-				attributeState('idle', label: "idle", backgroundColor:"#d28de0")
-				attributeState('heating', label: "heating", backgroundColor:"#ff9c14")	
-                attributeState('off', label: "off", backGroundColor:"#21212")			
-                attributeState('default', label: "idle", backgroundColor:"#d28de0", defaultState: true) 
+				attributeState('idle', label: "idle", backgroundColor:"#51bec2")
+				attributeState('heating', label: "heating", backgroundColor:"#ff242b")	
+                attributeState('off', label: "off", backgroundColor:"#181344")			
+                attributeState('default', label: "idle", backgroundColor:"#51bec2", defaultState: true) 
 			}
             tileAttribute ("device.water", key: "SECONDARY_CONTROL") {				
 				attributeState "wet", 
@@ -78,8 +80,14 @@ metadata {
 			
         }
         
+        standardTile("mode", "mode", canChangeIcon: false , decoration: "flat") {
+       		state "eco", label: 'Eco', action: "performance", icon: "st.Outdoor.outdoor19", backgroundColor: "#79b821"
+       		state "performance", label: 'Perf', action: "eco", icon: "st.Transportation.transportation8", backgroundColor: "#ff8a8e"
+		}
+        
+        
 		main "summary"
-		details(["summary", "switch", "refresh"])
+		details(["summary", "switch", "mode", "refresh"])
 	}
 }
 
@@ -92,6 +100,16 @@ def installed() {
 
 def refresh() {
 	parent.refresh()
+}
+
+def eco() {
+log.debug "clicked perf"
+    sendEvent(name: "mode", value: "eco")
+}
+
+def performance() {
+log.debug "clicked eco"
+    sendEvent(name: "mode", value: "performance")
 }
 
 def on() {
