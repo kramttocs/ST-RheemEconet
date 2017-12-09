@@ -186,6 +186,7 @@ def getAlerts(){
         }
 
     }
+	}
 
 
 // Schedule refresh
