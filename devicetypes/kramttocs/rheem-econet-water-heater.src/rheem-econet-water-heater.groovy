@@ -92,8 +92,8 @@ metadata {
        		state "on", label: 'Vacation', action: "disableVacation", icon: "st.Home.home18", backgroundColor: "#79b821"
        		state "off", label: 'Home', action: "enableVacation", icon: "st.Home.home2", backgroundColor: "#ff8a8e"
 		}
-        standardTile("alert", "alert", canChangeIcon: false ,  width: 6, height: 3) {
-       		state "alert", label: 'this is a really long explanation of the alert and what it means', action: "getAlerts"
+        valueTile("alert", "alert", canChangeIcon: false ,  width: 6, height: 3) {
+       		state "alert", label:'${currentValue}', action: "getAlerts"
 		}
         valueTile("minSetPoint", "device.minSetPoint", inactiveLabel: false) {
 			state("minSetPoint", label:'Min\n${currentValue}°',
@@ -136,9 +136,23 @@ def refresh() {
 	parent.refresh();
 }
 
-def getAlerts(){
-	log.debug "getting alerts"
-	parent.getAlerts();
+def getAlerts(){	
+    parent.getAlerts();
+}
+
+def updateAlertData(data){
+    if(data == null || data.empty)
+    {
+    	sendEvent(name: "alert", value: "No Current Alerts");
+    }
+    else
+    {
+    	def alerts        
+    	for(alertItem in data){
+         alerts += alertItem.code + " -- " + alertItem.description + "\n\n"
+        }
+    	sendEvent(name: "alert", value: alerts);
+    }
 }
 
 def eco() {

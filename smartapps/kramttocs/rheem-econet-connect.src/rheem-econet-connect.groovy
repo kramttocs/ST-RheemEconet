@@ -181,7 +181,7 @@ def getAlerts(){
     	apiGet("/alerts", [id: $id] ) { response ->
     		if (response.status == 200) {
             	log.debug "Got alerts: $response.data"
-            	return response.data
+            	it.updateAlertData(response.data)
             }
         }
 
