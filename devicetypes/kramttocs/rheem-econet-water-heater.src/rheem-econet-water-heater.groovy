@@ -12,7 +12,7 @@
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
- *  Last Updated : 2017-01-04
+ *  Last Updated : 12/9/2017
  *
  *  Based on https://github.com/copy-ninja/SmartThings_RheemEcoNet
  *  Based on https://github.com/jjhuff/SmartThings_RheemEcoNet
@@ -60,15 +60,15 @@ metadata {
         	tileAttribute("device.heatingSetpoint", key: "PRIMARY_CONTROL") {
 				attributeState("heatingSetpoint", label:'${currentValue}°', unit:"dF", defaultState: true)
 			}
-			tileAttribute("changeHeatingSetPoint", key: "VALUE_CONTROL") {
+			tileAttribute("device.heatingSetpoint", key: "VALUE_CONTROL") {
 				attributeState("VALUE_UP", action: "heatLevelUp")
 				attributeState("VALUE_DOWN", action: "heatLevelDown")
 			}
-			tileAttribute('thermostatOperatingStateDisplay', key: "OPERATING_STATE") {
-				attributeState('idle', label: 'idle', backgroundColor:"#51bec2")
-				attributeState('heating', label: 'heating', backgroundColor:"#ff242b")	
-                attributeState('off', label: 'off', backgroundColor:"#181344")			
-                attributeState('default', label: 'idle', backgroundColor:"#51bec2", defaultState: true) 
+			tileAttribute("device.thermostatOperatingStateDisplay", key: "OPERATING_STATE") {
+				attributeState("idle", label: 'idle', backgroundColor:"#51bec2")
+				attributeState("heating", label: 'heating', backgroundColor:"#ff242b")	
+                attributeState("off", label: 'off', backgroundColor:"#181344")			
+                attributeState("default", label: 'idle', backgroundColor:"#51bec2", defaultState: true) 
 			}
             tileAttribute ("device.water", key: "SECONDARY_CONTROL") {				
 				attributeState "wet", 
