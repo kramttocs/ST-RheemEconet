@@ -56,7 +56,7 @@ metadata {
 			state("default", action:"refresh.refresh", icon:"st.secondary.refresh")
 		}
         
-         multiAttributeTile(name:"summary", type: "thermostat", width: 6, height: 4, canChangeIcon: false, canChangeBackground: true) {
+         multiAttributeTile(name:"summary", type: "thermostat", width: 6, height: 4, canChangeIcon: true) {
         	tileAttribute("device.heatingSetpoint", key: "PRIMARY_CONTROL") {
 				attributeState("heatingSetpoint", label:'${currentValue}°', unit:"dF", defaultState: true)
 			}
@@ -65,10 +65,10 @@ metadata {
 				attributeState("VALUE_DOWN", action: "heatLevelDown")
 			}
 			tileAttribute('thermostatOperatingStateDisplay', key: "OPERATING_STATE") {
-				attributeState('idle', label: "idle", backgroundColor:"#51bec2")
-				attributeState('heating', label: "heating", backgroundColor:"#ff242b")	
-                attributeState('off', label: "off", backgroundColor:"#181344")			
-                attributeState('default', label: "idle", backgroundColor:"#51bec2", defaultState: true) 
+				attributeState('idle', label: 'idle', backgroundColor:"#51bec2")
+				attributeState('heating', label: 'heating', backgroundColor:"#ff242b")	
+                attributeState('off', label: 'off', backgroundColor:"#181344")			
+                attributeState('default', label: 'idle', backgroundColor:"#51bec2", defaultState: true) 
 			}
             tileAttribute ("device.water", key: "SECONDARY_CONTROL") {				
 				attributeState "wet", 
