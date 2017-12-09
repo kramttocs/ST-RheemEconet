@@ -33,6 +33,8 @@ metadata {
 		command "heatLevelDown"
         command "eco"
         command "performance"
+		command "enableVacation"
+		command "disableVacation"
 		command "updateDeviceData", ["string"]
         
         attribute "maxSetPoint", "number"
@@ -84,10 +86,15 @@ metadata {
        		state "eco", label: 'Eco', action: "performance", icon: "st.Outdoor.outdoor19", backgroundColor: "#79b821"
        		state "performance", label: 'Perf', action: "eco", icon: "st.Transportation.transportation8", backgroundColor: "#ff8a8e"
 		}
+		
+		standardTile("vacation", "vacation", canChangeIcon: false , decoration: "flat") {
+       		state "on", label: 'Vacation', action: "disableVacation", icon: "st.Home.home18", backgroundColor: "#79b821"
+       		state "off", label: 'Home', action: "enableVacation", icon: "st.Home.home2", backgroundColor: "#ff8a8e"
+		}
         
         
 		main "summary"
-		details(["summary", "switch", "mode", "refresh"])
+		details(["summary", "switch", "mode", "vacation", "refresh"])
 	}
 }
 
@@ -103,13 +110,31 @@ def refresh() {
 }
 
 def eco() {
-log.debug "clicked perf"
+	log.debug "clicked perf"
+	parent.setDeviceMode(this.device, "Energy Saver")
     sendEvent(name: "mode", value: "eco")
+	parent.refresh();
 }
 
 def performance() {
-log.debug "clicked eco"
+	log.debug "clicked eco"
+	parent.setDeviceMode(this.device, "Performance")
     sendEvent(name: "mode", value: "performance")
+	parent.refresh();
+}
+
+def enableVacation() {
+	log.debug "clicked off vaca"
+	parent.setDeviceVacation(this.device, true)
+    sendEvent(name: "vacation", value: "on")
+	parent.refresh();
+}
+
+def disableVacation() {
+	log.debug "clicked on vaca"
+	parent.setDeviceVacation(this.device, false)
+    sendEvent(name: "vacation", value: "off")
+	parent.refresh();
 }
 
 def on() {

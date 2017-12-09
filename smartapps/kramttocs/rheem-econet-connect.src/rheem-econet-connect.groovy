@@ -1,7 +1,7 @@
 /**
  *  Rheem EcoNet (Connect)
  *
- *  Copyright 2017 Justin Huff
+ *  Copyright 2017 Scott Mark
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -12,15 +12,16 @@
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
- *  Last Updated : 1/1/17
+ *  Last Updated : 12/8/17
  *
  *  Based on https://github.com/copy-ninja/SmartThings_RheemEcoNet
+ *  Based on https://github.com/jjhuff/SmartThings_RheemEcoNet
  *
  */
 definition(
-    name: "Rheem EcoNet (Connect)",
-    namespace: "jjhuff",
-    author: "Justin Huff",
+    name: "Rheem EcoNet (Connect) Water Heater",
+    namespace: "kramttocs",
+    author: "Scott Mark",
     description: "Connect to Rheem EcoNet",
     category: "SmartThings Labs",
     iconUrl: "http://smartthings.copyninja.net/icons/Rheem_EcoNet@1x.png",
@@ -93,7 +94,7 @@ def initialize() {
         def name  = waterHeaterList[it]
         if (dev == null) {
 	        try {
-    			addChildDevice("jjhuff", "Rheem Econet Water Heater", it, null, ["name": "Rheem Econet: " + name])
+    			addChildDevice("kramttocs", "Rheem Econet Water Heater", it, null, ["name": "Rheem Econet: " + name])
     	    } catch (e)	{
 				log.debug "addChildDevice Error: $e"
           	}
@@ -201,6 +202,28 @@ def setDeviceEnabled(childDevice, enabled) {
     	apiPut("/equipment/$childDevice.deviceNetworkId", [
         	body: [
                 isEnabled: enabled,
+            ]
+        ])
+    }
+}
+
+def setDeviceMode(childDevice, mode) {
+	log.info "setDeviceMode: $childDevice.deviceNetworkId $mode" 
+	if (login()) {
+    	apiPut("/equipment/$childDevice.deviceNetworkId", [
+        	body: [
+                mode: mode,
+            ]
+        ])
+    }
+}
+
+def setDeviceVacation(childDevice, vacation) {
+	log.info "setDeviceMode: $childDevice.deviceNetworkId $vacation" 
+	if (login()) {
+    	apiPut("/equipment/$childDevice.deviceNetworkId", [
+        	body: [
+                isOnVacation: vacation,
             ]
         ])
     }
