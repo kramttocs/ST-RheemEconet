@@ -150,6 +150,9 @@ def updateAlertData(data){
     	def alerts        
     	for(alertItem in data){
          alerts += alertItem.code + " -- " + alertItem.description + "\n\n"
+		 if(alertItem.code == "A102"){			
+			sendEvent(name: "water", value: data.hasCriticalAlert ? "wet" : "dry")
+		 }
         }
     	sendEvent(name: "alert", value: alerts);
     }
@@ -228,11 +231,14 @@ def heatLevelDown() {
 
 def updateDeviceData(data) {
 	sendEvent(name: "heatingSetpoint", value: data.setPoint)    
-    sendEvent(name: "water", value: data.hasCriticalAlert ? "wet" : "dry")
     sendEvent(name: "thermostatOperatingStateDisplay",  value: (data.isEnabled ? (data.inUse ? "heating" : "idle") : "off"))
     sendEvent(name: "switch", value: data.isEnabled ? "on" : "off")
     sendEvent(name: "minSetPoint", value: data.minSetPoint)    
     sendEvent(name: "maxSetPoint", value: data.maxSetPoint)
 	sendEvent(name: "vacation", value: data.isOnVacation ? "on" : "off")
 	sendEvent(name: "mode", value: data.mode == "Energy Saver" ? "eco" : "performance")
+	if(data.hasCriticalAlert)
+	{
+		getAlerts();
+	}
 }
