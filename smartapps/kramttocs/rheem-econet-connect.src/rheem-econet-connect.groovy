@@ -19,7 +19,7 @@
  *
  */
 definition(
-    name: "Rheem EcoNet (Connect) Water Heater",
+    name: "Rheem EcoNet (Connect)",
     namespace: "kramttocs",
     author: "Scott Mark",
     description: "Connect to Rheem EcoNet",
