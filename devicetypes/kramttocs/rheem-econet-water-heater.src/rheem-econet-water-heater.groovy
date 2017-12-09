@@ -144,14 +144,15 @@ def updateAlertData(data){
     if(data == null || data.empty)
     {
     	sendEvent(name: "alert", value: "No Current Alerts");
+        sendEvent(name: "water", value: "dry")
     }
     else
     {
-    	def alerts        
+    	def alerts = ""
     	for(alertItem in data){
          alerts += alertItem.code + " -- " + alertItem.description + "\n\n"
-		 if(alertItem.code == "A102"){			
-			sendEvent(name: "water", value: data.hasCriticalAlert ? "wet" : "dry")
+		 if(alertItem.code == "A102"){
+			sendEvent(name: "water", value: "wet")
 		 }
         }
     	sendEvent(name: "alert", value: alerts);
@@ -237,8 +238,5 @@ def updateDeviceData(data) {
     sendEvent(name: "maxSetPoint", value: data.maxSetPoint)
 	sendEvent(name: "vacation", value: data.isOnVacation ? "on" : "off")
 	sendEvent(name: "mode", value: data.mode == "Energy Saver" ? "eco" : "performance")
-	if(data.hasCriticalAlert)
-	{
-		getAlerts();
-	}
+	getAlerts();
 }
