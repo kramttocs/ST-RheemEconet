@@ -35,6 +35,7 @@ metadata {
         command "performance"
 		command "enableVacation"
 		command "disableVacation"
+		command "getAlerts"
 		command "updateDeviceData", ["string"]
         
         attribute "maxSetPoint", "number"
@@ -91,10 +92,36 @@ metadata {
        		state "on", label: 'Vacation', action: "disableVacation", icon: "st.Home.home18", backgroundColor: "#79b821"
        		state "off", label: 'Home', action: "enableVacation", icon: "st.Home.home2", backgroundColor: "#ff8a8e"
 		}
-        
+        standardTile("alert", "alert", canChangeIcon: false ,  width: 6, height: 3) {
+       		state "alert", label: 'this is a really long explanation of the alert and what it means', action: "getAlerts"
+		}
+        valueTile("minSetPoint", "device.minSetPoint", inactiveLabel: false) {
+			state("minSetPoint", label:'Min\n${currentValue}°',
+				backgroundColors:[
+					[value: 90,  color: "#f49b88"],
+					[value: 100, color: "#f28770"],
+					[value: 110, color: "#f07358"],
+					[value: 120, color: "#ee5f40"],
+					[value: 130, color: "#ec4b28"],
+					[value: 140, color: "#ea3811"]					
+				]
+			)
+		}
+        valueTile("maxSetPoint","maxSetPoint", inactiveLabel: false) {
+			state("maxSetPoint", label:'Max\n${currentValue}°',
+				backgroundColors:[
+					[value: 90,  color: "#f49b88"],
+					[value: 100, color: "#f28770"],
+					[value: 110, color: "#f07358"],
+					[value: 120, color: "#ee5f40"],
+					[value: 130, color: "#ec4b28"],
+					[value: 140, color: "#ea3811"]					
+				]
+			)
+		}
         
 		main "summary"
-		details(["summary", "switch", "mode", "vacation", "refresh"])
+		details(["summary", "switch", "mode", "vacation", "minSetPoint", "maxSetPoint", "alert", "refresh"])
 	}
 }
 
@@ -106,7 +133,12 @@ def installed() {
 }
 
 def refresh() {
-	parent.refresh()
+	parent.refresh();
+}
+
+def getAlerts(){
+	log.debug "getting alerts"
+	parent.getAlerts();
 }
 
 def eco() {

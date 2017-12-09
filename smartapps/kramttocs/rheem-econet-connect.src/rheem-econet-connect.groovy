@@ -169,6 +169,25 @@ def refresh() {
 	}
 }
 
+def getAlerts(){
+	if (!login()) {
+    	return
+    }
+    
+	log.info "Getting Alerts..."
+	// get all the children and send updates
+	getAllChildDevices().each {
+    	def id = it.deviceNetworkId
+    	apiGet("/alerts", [id: $id] ) { response ->
+    		if (response.status == 200) {
+            	log.debug "Got alerts: $response.data"
+            	return response.data
+            }
+        }
+
+    }
+
+
 // Schedule refresh
 def runRefresh(evt) {
 	log.info "Last refresh was "  + ((now() - state.polling?.last?:0)/60000) + " minutes ago"
