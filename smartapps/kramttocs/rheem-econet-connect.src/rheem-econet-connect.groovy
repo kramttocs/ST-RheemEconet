@@ -156,6 +156,7 @@ def refresh() {
     		if (response.status == 200) {
             	log.debug "Got data: $response.data"
             	it.updateDeviceData(response.data)
+                log.debug "Updated Device Data"
             }
         }
 

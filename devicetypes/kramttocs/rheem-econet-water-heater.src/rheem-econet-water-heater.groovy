@@ -134,6 +134,7 @@ def installed() {
 
 def refresh() {
 	parent.refresh();
+	parent.getAlerts();
 }
 
 def getAlerts(){	
@@ -160,28 +161,26 @@ def updateAlertData(data){
 }
 
 def eco() {
-	log.debug "clicked perf"
 	parent.setDeviceMode(this.device, "Energy Saver")
     sendEvent(name: "mode", value: "eco")
 	parent.refresh();
 }
 
 def performance() {
-	log.debug "clicked eco"
 	parent.setDeviceMode(this.device, "Performance")
     sendEvent(name: "mode", value: "performance")
 	parent.refresh();
 }
 
 def enableVacation() {
-	log.debug "clicked off vaca"
+	log.debug "Enabling Vacation"
 	parent.setDeviceVacation(this.device, true)
     sendEvent(name: "vacation", value: "on")
 	parent.refresh();
 }
 
 def disableVacation() {
-	log.debug "clicked on vaca"
+	log.debug "Disabling Vacation"
 	parent.setDeviceVacation(this.device, false)
     sendEvent(name: "vacation", value: "off")
 	parent.refresh();
@@ -237,6 +236,5 @@ def updateDeviceData(data) {
     sendEvent(name: "minSetPoint", value: data.minSetPoint)    
     sendEvent(name: "maxSetPoint", value: data.maxSetPoint)
 	sendEvent(name: "vacation", value: data.isOnVacation ? "on" : "off")
-	sendEvent(name: "mode", value: data.mode == "Energy Saver" ? "eco" : "performance")
-	getAlerts();
+	sendEvent(name: "mode", value: data.mode == "Energy Saver" ? "eco" : "performance")    
 }
