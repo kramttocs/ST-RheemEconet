@@ -219,7 +219,7 @@ def setDeviceMode(childDevice, mode) {
 }
 
 def setDeviceVacation(childDevice, vacation) {
-	log.info "setDeviceMode: $childDevice.deviceNetworkId $vacation" 
+	log.info "setDeviceVacation: $childDevice.deviceNetworkId $vacation" 
 	if (login()) {
     	apiPut("/equipment/$childDevice.deviceNetworkId", [
         	body: [
