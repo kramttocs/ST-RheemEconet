@@ -45,7 +45,7 @@ metadata {
 
     tiles {
 
-		standardTile("switch", "device.switch", canChangeIcon: false, decoration: "flat" ) {
+		standardTile("switch", "device.switch", decoration: "flat" ) {
        		state "on", label: 'On', action: "switch.off",
           		icon: "st.switches.switch.on", backgroundColor: "#79b821"
        		state"off", label: 'Off', action: "switch.on",
@@ -56,7 +56,7 @@ metadata {
 			state("default", action:"refresh.refresh", icon:"st.secondary.refresh")
 		}
         
-         multiAttributeTile(name:"summary", type: "thermostat", width: 6, height: 4) {
+         multiAttributeTile(name:"summary", type: "thermostat", width: 6, height: 4, canChangeIcon: false, canChangeBackground: true) {
         	tileAttribute("device.heatingSetpoint", key: "PRIMARY_CONTROL") {
 				attributeState("heatingSetpoint", label:'${currentValue}°', unit:"dF", defaultState: true)
 			}
@@ -83,16 +83,16 @@ metadata {
 			
         }
         
-        standardTile("mode", "mode", canChangeIcon: false , decoration: "flat") {
+        standardTile("mode", "mode", decoration: "flat") {
        		state "eco", label: 'Eco', action: "performance", icon: "st.Outdoor.outdoor19", backgroundColor: "#79b821"
        		state "performance", label: 'Perf', action: "eco", icon: "st.Transportation.transportation8", backgroundColor: "#ff8a8e"
 		}
 		
-		standardTile("vacation", "vacation", canChangeIcon: false , decoration: "flat") {
+		standardTile("vacation", "vacation", decoration: "flat") {
        		state "on", label: 'Vacation', action: "disableVacation", icon: "st.Home.home18", backgroundColor: "#79b821"
        		state "off", label: 'Home', action: "enableVacation", icon: "st.Home.home2", backgroundColor: "#ff8a8e"
 		}
-        valueTile("alert", "alert", canChangeIcon: false ,  width: 6, height: 3) {
+        valueTile("alert", "alert", width: 6, height: 3) {
        		state "alert", label:'${currentValue}', action: "getAlerts"
 		}
         valueTile("minSetPoint", "device.minSetPoint", inactiveLabel: false) {
