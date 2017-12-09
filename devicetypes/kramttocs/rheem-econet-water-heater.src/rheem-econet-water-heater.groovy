@@ -187,4 +187,6 @@ def updateDeviceData(data) {
     sendEvent(name: "switch", value: data.isEnabled ? "on" : "off")
     sendEvent(name: "minSetPoint", value: data.minSetPoint)    
     sendEvent(name: "maxSetPoint", value: data.maxSetPoint)
+	sendEvent(name: "vacation", value: data.isOnVacation ? "on" : "off")
+	sendEvent(name: "mode", value: data.mode == "Energy Saver" ? "eco" : "performance")
 }
